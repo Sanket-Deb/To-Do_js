@@ -45,6 +45,16 @@ ul {
     margin-bottom: 10px;
 } 
 
+span{
+    text-decoration: none;
+    opacity: 1;
+    transition: 0.4s ease;
+}
+span[status="true"]{
+    text-decoration: line-through;
+    opacity: 0.4;
+}
+
 
 .deleteTask {
     background-color: red;

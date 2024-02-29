@@ -2,97 +2,75 @@
 const addButton = document.getElementById('addTasks');
 const taskInput = document.getElementById('taskInput');
 const taskList = document.getElementById('taskList');
-
+let todoList=[];
 
 loadTasks();
 
 function addTask(){
-    
+    let todo;
     const task = taskInput.value.trim()
-
     if (task){
-
-        createTaskElement(task);
-
+        todo = {
+            name: task,
+            status: false,
+        }
         taskInput.value ='';
-
-        saveTasks();
+        createTodo(todo);
     }
 }
 
 addButton.addEventListener("click", addTask);
 
 
-function createTaskElement(task){
+function createTodo(todo){
 
     const listItem = document.createElement('li');
-    listItem.innerHTML = task.split(" ").filter((item)=>item !=="true" && item !=="false").join(" ");
-    listItem.setAttribute("name",listItem.textContent.replace('Delete','').trim());
 
+    const checkBox = document.createElement('input');
+    checkBox.type = 'checkbox';
+    checkBox.className = 'check';
+    checkBox.checked = todo.status;
+    listItem.appendChild(checkBox);
+
+    const todoName = document.createElement('span');
+    todoName.innerHTML = todo.name;
+    listItem.appendChild(todoName);
+    if(todo.status){
+        todoName.setAttribute("status", todo.status);
+    }
     const deleteButton = document.createElement('button');
     deleteButton.innerHTML =  "Delete";
     deleteButton.className ='deleteTask';
-    console.log(deleteButton.textContent);
-    
     listItem.appendChild(deleteButton);
-    taskList.appendChild(listItem);
-
+    
     deleteButton.addEventListener('click',()=>{
         taskList.removeChild(listItem);
+        todoList= todoList.filter(item => item.name !==listItem.childNodes[1].textContent);
         saveTasks();
     } );
-
-    const checkBox = document.createElement('input');
-    checkBox.checked = task.split(" ")[1]==="true"?true:false;
-    checkBox.type = 'checkbox';
-    checkBox.className = 'check';
-
-    listItem.appendChild(checkBox);
+    
     taskList.appendChild(listItem);
+    todoList = [...todoList, todo ];
+    saveTasks()
+
     checkBox.addEventListener('change',(event)=>{
         if(event.target.checked){
-            listItem.style.opacity = 0.4;
-            listItem.setAttribute("status",checkBox.checked);
-            listItem.setAttribute("name",listItem.textContent.replace('Delete','').trim().split(" ")[0]);
-            todoStatus.innerHTML = " " +checkBox.checked;
-            listItem.replaceChild(todoStatus, listItem.childNodes[3]);
+            todo.status = true;
+            todoName.setAttribute("status", todo.status);
         }
         else{
-            listItem.style.opacity = 1;
-            listItem.setAttribute("status",checkBox.checked);
-            listItem.setAttribute("name",listItem.textContent.replace('Delete','').trim().split(" ")[0]);
-            todoStatus.innerHTML = " " +checkBox.checked;
-            listItem.replaceChild(todoStatus, listItem.childNodes[3]);
+            todo.status = false;
+            todoName.removeAttribute("status", todo.status);
         }
-        let childNodes = taskList.childNodes;
-        const liArray = Array.from(childNodes).map((item)=> item.attributes.name.value);
-        taskList.replaceChild(listItem, taskList.childNodes[liArray.indexOf(event.target.parentElement.attributes.name.value)]);
         saveTasks()
     })
-
-    const todoStatus = document.createElement('p');
-    todoStatus.innerHTML = " " +checkBox.checked;
-    todoStatus.style.display = 'none';
-    listItem.appendChild(todoStatus);
-    taskList.appendChild(listItem);
-    if(listItem.textContent.split(" ")[1].replace('Delete','').trim()==="true"){
-        listItem.style.opacity = 0.4;
-    }
-
 }
+
 function saveTasks(){
-
-    let tasks =[]
-    taskList.querySelectorAll('li').forEach(function(item){
-        tasks.push(item.textContent.replace('Delete','').trim());
-    });
-
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    localStorage.setItem('todoList', JSON.stringify(todoList));
 }
 
 function loadTasks(){
-
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-    tasks.forEach(createTaskElement);
+    const tasks = JSON.parse(localStorage.getItem('todoList')) || [];
+    tasks.forEach(createTodo);
 }
