@@ -1,5 +1,3 @@
-
-const addButton = document.getElementById('addTasks');
 const taskInput = document.getElementById('taskInput');
 const taskList = document.getElementById('taskList');
 let todoList=[];
@@ -19,7 +17,6 @@ function addTask(){
     }
 }
 
-addButton.addEventListener("click", addTask);
 
 
 function createTodo(todo){
